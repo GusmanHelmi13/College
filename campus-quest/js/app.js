@@ -16,6 +16,9 @@ window.AppState = {
     const saved = Storage.load();
     this.gameState = saved || Storage.getDefault();
 
+    // Save migration: patch save lama yang tidak punya fields baru (BUG-09/24)
+    this.migrateSave(this.gameState);
+
     // Init subsystems
     DarkMode.init(this.gameState.darkMode || false);
 
@@ -159,10 +162,17 @@ window.AppState = {
     const completed   = (gs.completedLevels || []).length + (gs.gardenUnlocked ? 1 : 0);
     const pct         = Math.round((completed / totalSteps) * 100);
 
-    document.getElementById('mainProgressFill').style.width = pct + '%';
-    document.getElementById('progressPercent').textContent  = pct + '%';
-    document.getElementById('miniProgress').style.width     = pct + '%';
-    document.getElementById('miniProgressLabel').textContent = pct + '%';
+    // BUG-25: null guard semua DOM elements
+    const mainFill = document.getElementById('mainProgressFill');
+    const pctLabel = document.getElementById('progressPercent');
+    const miniFill = document.getElementById('miniProgress');
+    const miniLbl  = document.getElementById('miniProgressLabel');
+    const btnCont  = document.getElementById('btnContinue');
+
+    if (mainFill) mainFill.style.width = pct + '%';
+    if (pctLabel) pctLabel.textContent  = pct + '%';
+    if (miniFill) miniFill.style.width  = pct + '%';
+    if (miniLbl)  miniLbl.textContent   = pct + '%';
 
     // Milestone markers
     document.querySelectorAll('.milestone').forEach(m => {
@@ -173,9 +183,9 @@ window.AppState = {
       m.classList.toggle('reached', !!reached);
     });
 
-    // Continue button
+    // Continue button — BUG-25: null guard
     const hasSave = (gs.completedLevels || []).length > 0;
-    document.getElementById('btnContinue').style.display = hasSave ? 'inline-block' : 'none';
+    if (btnCont) btnCont.style.display = hasSave ? 'inline-block' : 'none';
 
     // Level cards
     this.refreshLevelCards();
@@ -217,21 +227,66 @@ window.AppState = {
     // Garden card
     const gardenCard = document.getElementById('levelCard5');
     const gardenConn = document.getElementById('gardenConnector');
+
+    // BUG-12: set gardenUnlocked=true+save saat semua 4 level selesai
+    if (completed.length === 4 && !gs.gardenUnlocked) {
+      gs.gardenUnlocked = true;
+      Storage.save(gs);
+    }
+
     if (gs.gardenUnlocked) {
       if (gardenCard) {
         gardenCard.style.display = 'block';
         gardenCard.classList.remove('locked');
-        document.getElementById('levelStatus5').textContent = '🌸 OPEN';
+        const s5 = document.getElementById('levelStatus5');
+        if (s5) s5.textContent = '🌸 OPEN';
       }
       if (gardenConn) gardenConn.style.display = 'block';
     } else if (completed.length === 4) {
-      // All 4 done but garden page not yet seen — show teaser
+      // fallback teaser (harusnya tidak tercapai setelah fix di atas)
       if (gardenCard) {
         gardenCard.style.display = 'block';
         gardenCard.classList.remove('locked');
-        document.getElementById('levelStatus5').textContent = '🌸 UNLOCK';
+        const s5 = document.getElementById('levelStatus5');
+        if (s5) s5.textContent = '🌸 UNLOCK';
       }
       if (gardenConn) gardenConn.style.display = 'block';
+    }
+  },
+
+  /* ============================================
+     SAVE MIGRATION — patch save lama (BUG-09/24)
+     Tambah fields baru yang belum ada di save lama
+     ============================================ */
+  migrateSave(gs) {
+    let dirty = false;
+    const ensure = (key, def) => {
+      if (gs[key] === undefined || gs[key] === null) {
+        gs[key] = def;
+        dirty = true;
+      }
+    };
+
+    ensure('itemsCollected',   []);
+    ensure('chestsOpened',     0);
+    ensure('defeatedMonsters', []);
+    ensure('achievementDates', {});
+    ensure('gardenUnlocked',   false);
+    ensure('totalStars',       0);
+    ensure('messagesCollected', 0);
+    ensure('levelStars',       { 1: 0, 2: 0, 3: 0, 4: 0 });
+    ensure('completedLevels',  []);
+    ensure('darkMode',         false);
+    ensure('currentLevel',     1);
+
+    // levelStars bisa ada tapi kurang key
+    [1,2,3,4].forEach(i => {
+      if (gs.levelStars[i] === undefined) { gs.levelStars[i] = 0; dirty = true; }
+    });
+
+    if (dirty) {
+      Storage.save(gs);
+      console.info('[CampusQuest] Save migrated to latest version.');
     }
   },
 

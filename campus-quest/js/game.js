@@ -180,11 +180,6 @@ const Game = (() => {
       // Arah visual
       zone.classList.toggle('dir-left',  leftActive);
       zone.classList.toggle('dir-right', rightActive);
-
-      // Kecepatan player proporsional dengan seberapa jauh knob ditarik
-      // (dikirim lewat key saja; game.js sudah pakai player.speed konstan,
-      //  tapi kita simpan nilai analog untuk masa depan)
-      const analogX = clamp(nx, -1, 1);
     }
 
     /* Reset knob ke tengah */
@@ -670,7 +665,7 @@ const Game = (() => {
       if (t.type === 'position') {
         if (player.x >= t.x) {
           firedTriggers.add(t.id);
-          scheduleMesage(LevelData.resolveMsg(t.msg));
+          scheduleMessage(LevelData.resolveMsg(t.msg));
 
           // Mark gate
           const gState = window.AppState?.gameState;
@@ -682,7 +677,7 @@ const Game = (() => {
         const m = level.monsters.find(m => m.id === t.monsterId);
         if (m && !m.alive && !firedTriggers.has(t.id)) {
           firedTriggers.add(t.id);
-          scheduleMesage(LevelData.resolveMsg(t.msg));
+          scheduleMessage(LevelData.resolveMsg(t.msg));
         }
       }
     });
@@ -1015,6 +1010,7 @@ const Game = (() => {
 
       if (it.type === 'key') {
         // ===== KUNCI — pixel art golden key =====
+        ctx.imageSmoothingEnabled = false;   // BUG-29: pastikan pixel art tetap sharp
         const pulse = 0.9 + Math.sin(t * 2 + it.x * 0.05) * 0.12;
         ctx.scale(pulse, pulse);
 

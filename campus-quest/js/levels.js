@@ -228,10 +228,10 @@ const LevelData = (() => {
     items: [
       item(260,  300, 'star',  'star1'),
       item(400,  220, 'key',   'key_chest1'),    // kunci chest1 di platform pertama
-      item(1140, 200, 'star',  'star3'),
+      item(1140, 200, 'star',  'star2'),          // FIX BUG-22: star2 (bukan star3)
       item(1400, 360, 'key',   'key_chest2'),    // kunci chest2
-      item(1900, 200, 'star',  'star4'),
-      item(2660, 200, 'star',  'star5'),
+      item(1900, 200, 'star',  'star3'),          // FIX: star3 (bukan star4)
+      item(2660, 200, 'star',  'star4'),          // FIX: star4 (bukan star5)
     ],
 
     monsters: [
@@ -280,7 +280,7 @@ const LevelData = (() => {
       { icon: '☕', label: 'Energy Coffee',   type: 'coffee' },
       { icon: '📖', label: 'Knowledge Book', type: 'book' }
     ],
-    starsFor: { items: 5, noHurt: false, time: 180 }
+    starsFor: { items: 6, noHurt: false, time: 180 }   // 4 star + 2 key = 6 items
   };
 
   /* ============================================

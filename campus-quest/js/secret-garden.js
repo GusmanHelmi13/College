@@ -266,6 +266,10 @@ const SecretGarden = (() => {
     const ss = document.getElementById('gdSlideshow');
     if (!ss) return;
 
+    // BUG-16: sembunyikan tombol kembali agar tidak bisa kabur saat slideshow
+    const backBtn = document.getElementById('gardenBackBtn');
+    if (backBtn) backBtn.style.display = 'none';
+
     // Bangun dots
     buildDots();
 
@@ -430,9 +434,14 @@ const SecretGarden = (() => {
     ss.style.opacity = '0';
     setTimeout(() => {
       ss.style.display = 'none';
+      // BUG-26: reset slideIdx ke 0 agar saat dibuka lagi mulai dari awal
+      slideIdx = 0;
       // Restore card untuk kali berikutnya
       const card = document.getElementById('gdCard');
       if (card) { card.style.display = ''; card.style.opacity = ''; }
+      // BUG-16: tampilkan kembali tombol kembali
+      const backBtn = document.getElementById('gardenBackBtn');
+      if (backBtn) backBtn.style.display = '';
     }, 500);
   }
 
