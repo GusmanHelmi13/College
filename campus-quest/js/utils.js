@@ -42,7 +42,12 @@ const Storage = {
       messagesCollected: 0,
       darkMode: false,
       gardenUnlocked: false,
-      lastPlayed: Date.now()
+      lastPlayed: Date.now(),
+      // fields used by achievements & game systems
+      itemsCollected:   [],
+      chestsOpened:     0,
+      defeatedMonsters: [],
+      achievementDates: {}
     };
   }
 };
@@ -51,7 +56,7 @@ const Storage = {
    PARTICLE SYSTEM
    ============================================ */
 const ParticleSystem = (() => {
-  const canvas = null;
+  // NOTE: canvas ref lives inside init() as local var `c`; this slot is intentionally empty
   let ctx = null;
   let particles = [];
   let animId = null;
@@ -431,6 +436,7 @@ function debounce(fn, delay) {
    ANIMATE NUMBER (count-up)
    ============================================ */
 function animateNumber(el, from, to, duration = 800) {
+  if (!el) return;
   const start = performance.now();
   const tick = (now) => {
     const p = Math.min(1, (now - start) / duration);

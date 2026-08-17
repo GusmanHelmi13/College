@@ -695,9 +695,9 @@ body {
    MOBILE CONTROLS — Virtual Analog Joystick
    ============================================ */
 
-/* Container — float di atas canvas bagian bawah */
+/* Container — float di atas canvas bagian bawah — SELALU tampil */
 .mobile-controls {
-  display: none;
+  display: flex;
   position: absolute;
   bottom: 0; left: 0; right: 0;
   height: 140px;
@@ -716,8 +716,7 @@ body {
   -webkit-user-select: none;
   touch-action: none;
 }
-@media (pointer: coarse)  { .mobile-controls { display: flex; } }
-@media (max-width: 768px) { .mobile-controls { display: flex; } }
+/* Hapus override media query — kontrol selalu muncul di semua ukuran layar */
 
 /* ── JOYSTICK AREA (kiri) ─────────────────── */
 .joystick-wrap {
@@ -1514,14 +1513,18 @@ html, body {
     overflow: hidden;
   }
 
-  /* Game area fills available height */
-  .game-area {
+  /* Game area fills available height — gunakan class .active, bukan display:flex !important */
+  .game-area.active {
     flex: 1;
-    display: flex !important;   /* keep visible when active */
+    display: flex;
     flex-direction: column;
     position: relative;
     border-radius: 8px;
     overflow: hidden;
+  }
+  /* Pastikan game-area tersembunyi saat tidak aktif */
+  .game-area:not(.active) {
+    display: none !important;
   }
 
   /* Canvas stretches to fill (JS sets explicit px size) */
@@ -1543,12 +1546,7 @@ html, body {
   .hud-score { font-size: 0.45rem; }
 
   /* Controls sit at the bottom of .game-area (override height ke 140px) */
-  .mobile-controls {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 140px;
-    flex-shrink: 0;
-  }
+  /* mobile-controls sudah di-set globally, tidak perlu override di sini */
 
   /* Level hub scrollable on small screens */
   .level-hub { overflow-y: auto; max-height: calc(100dvh - 80px); padding-bottom: 20px; }
@@ -1794,4 +1792,227 @@ html, body {
   .gd-polaroid   { padding: 8px 8px 30px; }
   .gd-message-text { font-size: 0.88rem; }
   .gd-nav-btn    { width: 36px; height: 36px; font-size: 0.9rem; }
+}
+
+/* ============================================
+   TUTORIAL OVERLAY
+   ============================================ */
+.tutorial-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.82);
+  backdrop-filter: blur(5px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 900;   /* di atas nav, HUD, game canvas, semua overlay lain */
+  animation: tutFadeIn 0.4s ease;
+}
+@keyframes tutFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Card */
+.tutorial-card {
+  background: var(--bg-card);
+  border: 3px solid var(--accent-yellow);
+  border-radius: 20px;
+  padding: 22px 20px 18px;
+  width: min(380px, 92vw);
+  display: flex; flex-direction: column; gap: 14px;
+  box-shadow: 0 0 40px rgba(255,212,59,0.25), 0 8px 32px rgba(0,0,0,0.6);
+  animation: tutCardIn 0.45s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes tutCardIn {
+  from { transform: scale(0.8) translateY(20px); opacity: 0; }
+  to   { transform: scale(1) translateY(0);      opacity: 1; }
+}
+
+/* Header */
+.tut-header { text-align: center; }
+.tut-badge {
+  display: inline-block;
+  font-size: 0.45rem; letter-spacing: 2px;
+  background: var(--accent-yellow); color: #3d2c1e;
+  padding: 3px 10px; border-radius: 4px;
+  margin-bottom: 6px;
+}
+.tut-title {
+  font-size: 0.75rem;
+  color: var(--text-primary);
+  text-shadow: 2px 2px 0 var(--accent-yellow);
+  margin: 0;
+}
+
+/* Slides */
+.tut-slides { position: relative; min-height: 170px; }
+.tut-slide {
+  display: none;
+  flex-direction: column; align-items: center; gap: 14px;
+  animation: tutSlideIn 0.35s ease;
+}
+.tut-slide.active { display: flex; }
+@keyframes tutSlideIn {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Demo area */
+.tut-demo {
+  display: flex; align-items: center; justify-content: center;
+  gap: 16px; min-height: 100px;
+}
+
+/* Mini joystick demo */
+.tut-demo-joystick { position: relative; }
+.tut-joy-ring {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  border: 2.5px solid rgba(255,255,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  box-shadow: 0 0 14px rgba(255,212,59,0.2);
+}
+.tut-joy-knob {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 36% 32%, #d8e8ff, #4dabf7 55%, #1c7ed6);
+  border: 2px solid rgba(255,255,255,0.4);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+  position: absolute;
+  transition: transform 0.15s ease;
+  /* animasi digerakkan JS */
+}
+.tut-demo-labels {
+  display: flex; flex-direction: column; gap: 4px;
+  align-items: center;
+}
+.tut-demo-arrow {
+  font-size: 1.2rem;
+  animation: tutArrowPulse 0.9s ease-in-out infinite alternate;
+  color: var(--accent-yellow);
+}
+.tut-demo-arrow.tut-arrow-left  { animation-delay: 0s;    }
+.tut-demo-arrow.tut-arrow-right { animation-delay: 0.45s; }
+@keyframes tutArrowPulse {
+  from { opacity: 0.3; transform: scale(0.9); }
+  to   { opacity: 1;   transform: scale(1.2); }
+}
+
+/* Button demos */
+.tut-demo-btn {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 3px;
+  font-size: 1.8rem;
+  animation: tutBtnPulse 1s ease-in-out infinite alternate;
+  box-shadow: 0 5px 0 rgba(0,0,0,0.35);
+}
+.tut-btn-blue {
+  background: radial-gradient(circle at 36% 32%, #a8d8ff, #4dabf7 55%, #1c7ed6);
+  box-shadow: 0 5px 0 #1864ab, 0 0 20px rgba(116,192,252,0.5);
+}
+.tut-btn-orange {
+  background: radial-gradient(circle at 36% 32%, #ffc078, #ff8c42 55%, #e8590c);
+  box-shadow: 0 5px 0 #c05800, 0 0 20px rgba(255,140,66,0.5);
+}
+.tut-btn-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.35rem; color: #fff; letter-spacing: 0.5px;
+}
+@keyframes tutBtnPulse {
+  from { transform: scale(1) translateY(0);   box-shadow: 0 5px 0 rgba(0,0,0,0.3), 0 0 10px rgba(255,212,59,0.2); }
+  to   { transform: scale(1.1) translateY(-3px); box-shadow: 0 8px 0 rgba(0,0,0,0.2), 0 0 24px rgba(255,212,59,0.5); }
+}
+
+/* Chest demo */
+.tut-demo-chest { flex-direction: column; }
+.tut-item-row {
+  display: flex; align-items: center; gap: 10px;
+}
+.tut-item-icon {
+  font-size: 2rem;
+  animation: tutIconFloat 1.2s ease-in-out infinite alternate;
+}
+.tut-arrow-right-big { font-size: 1.2rem; color: var(--accent-yellow); }
+@keyframes tutIconFloat {
+  from { transform: translateY(0) scale(1);   }
+  to   { transform: translateY(-5px) scale(1.08); }
+}
+
+/* Ready slide */
+.tut-demo-ready { flex-direction: column; align-items: center; gap: 8px; }
+.tut-character-anim { margin-bottom: 4px; }
+.tut-stars-float {
+  font-size: 1.4rem; letter-spacing: 6px;
+  animation: tutStarsFloat 1.5s ease-in-out infinite alternate;
+}
+@keyframes tutStarsFloat {
+  from { transform: translateY(0) scale(1);   opacity: 0.8; }
+  to   { transform: translateY(-6px) scale(1.1); opacity: 1; }
+}
+
+/* Description */
+.tut-desc {
+  text-align: center;
+  font-size: 0.88rem; line-height: 1.65;
+  color: var(--text-primary);
+  margin: 0;
+}
+.tut-desc small { color: var(--text-muted); font-size: 0.78rem; }
+
+/* Dots */
+.tut-dots {
+  display: flex; justify-content: center; gap: 8px;
+}
+.tut-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--border-strong);
+  transition: all 0.25s;
+}
+.tut-dot.active {
+  background: var(--accent-yellow);
+  transform: scale(1.4);
+  box-shadow: 0 0 6px var(--accent-yellow);
+}
+
+/* Navigation buttons */
+.tut-nav {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 10px;
+}
+.tut-nav-btn {
+  padding: 9px 18px; border-radius: 10px;
+  border: 2px solid var(--border-strong);
+  cursor: pointer; font-size: 0.78rem; font-weight: 700;
+  transition: all 0.15s;
+  font-family: 'Nunito', sans-serif;
+}
+.tut-skip {
+  background: transparent; color: var(--text-muted);
+}
+.tut-skip:hover { background: var(--bg-secondary); color: var(--text-primary); }
+.tut-next {
+  background: var(--accent-yellow); color: #3d2c1e;
+  border-color: var(--accent-orange);
+  font-size: 0.55rem;
+  box-shadow: 0 3px 0 var(--accent-orange);
+  flex: 1;
+}
+.tut-next:hover  { background: #ffe066; transform: translateY(-1px); }
+.tut-next:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--accent-orange); }
+.tut-next.finish {
+  background: var(--accent-green); border-color: #2b8a3e;
+  box-shadow: 0 3px 0 #2b8a3e;
+}
+.tut-next.finish:hover { background: #69db7c; }
+
+/* Responsive kecil */
+@media (max-width: 380px) {
+  .tut-joy-ring   { width: 56px; height: 56px; }
+  .tut-joy-knob   { width: 24px; height: 24px; }
+  .tut-demo-btn   { width: 60px; height: 60px; font-size: 1.5rem; }
+  .tut-desc       { font-size: 0.82rem; }
+  .tutorial-card  { padding: 16px 14px 14px; gap: 10px; }
 }

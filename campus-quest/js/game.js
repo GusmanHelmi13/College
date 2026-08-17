@@ -59,6 +59,9 @@ const Game = (() => {
   // Set of key item IDs yang sudah dikumpulkan player di level ini
   const collectedKeys = new Set();
 
+  /* ---------- LOCKED CHEST HINT COOLDOWN ---------- */
+  let lockedHintCooldown = 0;
+
   /* ---------- CONSTANTS ---------- */
   const GRAVITY      = 0.55;
   const TILE         = 16;
@@ -229,11 +232,31 @@ const Game = (() => {
     zone.addEventListener('pointercancel', endJoy);
     zone.addEventListener('pointerleave',  endJoy);
     window.addEventListener('pointerup',   endJoy);
+    // Fallback — touchend pada zone untuk browser yang tidak support pointer events penuh
+    zone.addEventListener('touchend',   () => { if (joyActive) { joyActive = false; joyId = -1; resetKnob(); } });
+    zone.addEventListener('touchcancel',() => { if (joyActive) { joyActive = false; joyId = -1; resetKnob(); } });
 
     // ── ACTION BUTTONS (Jump & Act) ──────────
     const ACTION_MAP = {
-      btnJump: { key: 'ArrowUp', onDown: () => { if (running && !paused && !messageActive) attemptJump(); } },
-      btnAct:  { key: 'Space',   onDown: () => { if (running && !paused && !messageActive) attemptAttack(); } },
+      btnJump: { key: 'ArrowUp',
+        onDown: () => {
+          // Hanya set key; game loop yang urus jump physics (cegah double-fire)
+          // attemptJump dipanggil lewat keyboard path di updatePlayer()
+          if (running && !paused && !messageActive && player.onGround && !jumpHeld) {
+            player.vy       = player.jumpForce;
+            player.onGround = false;
+            jumpHeld        = true;
+            player.state    = 'jump';
+            ParticleSystem.pixelBurst(
+              player.x + player.w / 2 - cam.x,
+              player.y + player.h     - cam.y
+            );
+          }
+        }
+      },
+      btnAct: { key: 'Space',
+        onDown: () => { if (running && !paused && !messageActive) attemptAttack(); }
+      },
     };
 
     Object.entries(ACTION_MAP).forEach(([btnId, cfg]) => {
@@ -315,9 +338,11 @@ const Game = (() => {
     // Update HUD
     updateHUD();
 
-    // Show canvas, hide hub
+    // Show canvas, hide hub — gunakan class active agar CSS mobile tidak override
     document.getElementById('levelHub').style.display  = 'none';
-    document.getElementById('gameArea').style.display  = 'block';
+    const gameArea = document.getElementById('gameArea');
+    gameArea.style.display = '';        // bersihkan inline style
+    gameArea.classList.add('active');
     document.getElementById('levelCompleteOverlay').style.display = 'none';
     document.getElementById('pauseOverlay').style.display         = 'none';
     document.getElementById('messagePopup').style.display         = 'none';
@@ -337,7 +362,9 @@ const Game = (() => {
     running = false;
     if (animId) { cancelAnimationFrame(animId); animId = null; }
 
-    document.getElementById('gameArea').style.display        = 'none';
+    const gameArea = document.getElementById('gameArea');
+    gameArea.style.display = 'none';
+    gameArea.classList.remove('active');
     document.getElementById('levelCompleteOverlay').style.display = 'none';
     document.getElementById('pauseOverlay').style.display         = 'none';
     document.getElementById('messagePopup').style.display         = 'none';
@@ -512,19 +539,27 @@ const Game = (() => {
     // --- KUNCI: masukkan ke inventory dan unlock chest yang membutuhkan ---
     if (it.type === 'key') {
       collectedKeys.add(it.id);
+
+      // Simpan ke global state (sama seperti item biasa)
+      const gStateK = window.AppState?.gameState;
+      if (gStateK) {
+        if (!gStateK.itemsCollected) gStateK.itemsCollected = [];
+        if (!gStateK.itemsCollected.includes(it.id)) gStateK.itemsCollected.push(it.id);
+      }
+
       // Unlock semua chest yang menunggu kunci ini
       level.chests.forEach(ch => {
         if (ch.keyId === it.id && ch.locked) {
           ch.locked = false;
-          // Efek kilat singkat di posisi chest
           ParticleSystem.burst(
             ch.x + ch.w / 2 - cam.x, ch.y - cam.y,
             { count: 16, type: 'star', speed: 3, size: 7,
               colors: ['#ffd43b', '#ffe566', '#c9a800'] }
           );
-          Toast.show('🔑 Kunci ditemukan! Peti terbuka!', 2500, '🔓');
+          Toast.show('🔑 Kunci ditemukan! Peti bisa dibuka!', 2500, '🔓');
         }
       });
+
       // Partikel kunci
       ParticleSystem.burst(
         it.x + it.w / 2 - cam.x, it.y - cam.y,
@@ -533,8 +568,15 @@ const Game = (() => {
       );
       FloatingHearts.spawn(it.x - cam.x + it.w / 2, it.y - cam.y);
       updateHUD();
-      // Pesan kunci
-      scheduleMesage('🔑 Kunci ditemukan! Sekarang kamu bisa membuka peti di depan!');
+
+      // Cek triggers untuk key item juga
+      const trigK = level.triggers?.find(t => t.type === 'item' && t.itemId === it.id);
+      if (trigK && !firedTriggers.has(trigK.id)) {
+        firedTriggers.add(trigK.id);
+        scheduleMesage(LevelData.resolveMsg(trigK.msg));
+      } else {
+        scheduleMesage('🔑 Kunci ditemukan! Sekarang kamu bisa membuka peti di depan!');
+      }
       return;
     }
 
@@ -579,8 +621,6 @@ const Game = (() => {
     });
   }
 
-  // Cooldown agar hint tidak spam setiap frame
-  let lockedHintCooldown = 0;
   function showLockedChestHint(ch) {
     if (lockedHintCooldown > 0) return;
     lockedHintCooldown = 90; // ~1.5 detik @ 60fps
@@ -706,10 +746,19 @@ const Game = (() => {
 
     if (m.hp <= 0) {
       m.alive = false;
-      stats.itemsGot++;
+      // Monster kill TIDAK menambah stats.itemsGot (untuk star calc yang akurat)
       ParticleSystem.confetti(30);
       FloatingHearts.spawn(m.x - cam.x + m.w / 2, m.y - cam.y);
       Toast.show('💪 Monster dikalahkan!', 2000, '⚔️');
+
+      // Catat monster yang dikalahkan ke save state
+      const gState = window.AppState?.gameState;
+      if (gState) {
+        if (!gState.defeatedMonsters) gState.defeatedMonsters = [];
+        if (!gState.defeatedMonsters.includes(m.id)) {
+          gState.defeatedMonsters.push(m.id);
+        }
+      }
     }
   }
 
@@ -744,8 +793,8 @@ const Game = (() => {
 
       inv.innerHTML = collected.slice(0, 5).map(i => {
         const isKey = i.type === 'key';
-        // Cek apakah kunci ini sudah dipakai (chest yang pakai kunci ini sudah unlocked)
-        const keyUsed = isKey && level.chests.some(ch => ch.keyId === i.id && !ch.locked);
+        // Kunci "used" = chest-nya sudah OPENED (bukan sekedar unlocked)
+        const keyUsed = isKey && level.chests.some(ch => ch.keyId === i.id && ch.opened);
         return `<div class="hud-item ${isKey ? 'hud-item-key' : ''} ${keyUsed ? 'hud-item-used' : ''}"
                      title="${isKey ? (keyUsed ? 'Kunci sudah dipakai' : 'Kunci: belum dipakai') : i.type}">
                   ${icons[i.type] || '✨'}
@@ -781,13 +830,18 @@ const Game = (() => {
 
   function closeMessage() {
     messageActive = false;
+    // Bersihkan key Space/ACT agar tidak langsung trigger chest lagi
+    keys.Space = false;
+    keys[' ']  = false;
     document.getElementById('messagePopup').style.display = 'none';
     if (pendingMessage) showMessage();
   }
 
   /* ---------- GAME OVER ---------- */
   function gameOver() {
-    paused = true;
+    // Jangan set paused=true — biarkan startLevel() yang reset semua state
+    running = false;
+    if (animId) { cancelAnimationFrame(animId); animId = null; }
     Toast.show('Jangan menyerah! Coba lagi ya 💪', 3000, '💖');
     setTimeout(() => {
       if (levelId) startLevel(levelId);

@@ -22,7 +22,7 @@ const LevelData = (() => {
   }
   function chest(x, y, id, keyId = null) {
     // keyId: id item kunci yang harus dikumpulkan dulu. null = bisa langsung dibuka.
-    return { x, y, w: 40, h: 32, id, opened: false, keyId, locked: keyId !== null };
+    return { x, y, w: 40, h: 32, id, opened: false, keyId, locked: keyId !== null, _shake: 0 };
   }
   function portal(x, y) {
     return { x, y, w: 40, h: 60 };
@@ -143,13 +143,14 @@ const LevelData = (() => {
 
     items: [
       item(360, 280, 'book',   'book1'),
-      item(500, 200, 'star',   'star1'),
-      item(780, 360, 'key',    'key_chest1'),    // kunci chest1 (di platform sebelum chest)
-      item(1040,280, 'book',   'book2'),
-      item(1380,120, 'star',   'star2'),
-      item(1560, 300,'key',    'key_chest2'),    // kunci chest2
-      item(2040,280, 'book',   'book3'),
-      item(2220,200, 'star',   'star3'),
+      item(500, 200, 'key',    'key_chest1'),    // kunci chest1 — SEBELUM chest di x=640
+      item(560, 200, 'star',   'star1'),
+      item(780, 360, 'book',   'book2'),          // buku dipindah agar star tidak tumpuk kunci
+      item(1040,280, 'star',   'star2'),
+      item(1380,120, 'key',    'key_chest2'),     // kunci chest2 — sebelum chest di x=1640
+      item(1560, 300,'book',   'book3'),
+      item(2040,280, 'star',   'star3'),
+      item(2220,200, 'star',   'star4'),
     ],
 
     monsters: [
@@ -326,8 +327,8 @@ const LevelData = (() => {
       item(900,  300, 'key',  'key_chest2'),    // kunci chest2
       item(1240, 280, 'star', 'star4'),
       item(1540, 120, 'star', 'star5'),
-      item(2380, 360, 'key',  'key_chest3'),    // kunci chest3 (boss chest)
       item(2220, 280, 'star', 'star6'),
+      item(2300, 200, 'key',  'key_chest3'),    // kunci chest3 — pindah ke x=2300 (sebelum patrol guard3 2360-2460)
       item(2520, 120, 'star', 'star7'),
     ],
 

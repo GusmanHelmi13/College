@@ -70,7 +70,10 @@ window.AppState = {
           SecretGarden.open();
           return;
         }
-        Game.startLevel(id);
+        // Tampilkan tutorial hanya saat pertama kali bermain
+        Tutorial.showIfFirstTime(() => {
+          Game.startLevel(id);
+        });
       });
     });
 

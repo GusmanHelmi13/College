@@ -221,6 +221,102 @@
         <!-- Game Canvas -->
         <canvas id="gameCanvas"></canvas>
 
+        <!-- ===== TUTORIAL OVERLAY ===== -->
+        <!-- position:fixed — tampil di atas segalanya, tidak butuh gameArea aktif -->
+        <div class="tutorial-overlay" id="tutorialOverlay" style="display:none">
+          <div class="tutorial-card">
+
+            <div class="tut-header">
+              <span class="tut-badge pixel-font">HOW TO PLAY</span>
+              <h2 class="tut-title pixel-font">Campus Quest</h2>
+            </div>
+
+            <!-- Slides container -->
+            <div class="tut-slides" id="tutSlides">
+
+              <!-- Slide 1: Gerak -->
+              <div class="tut-slide active" data-slide="0">
+                <div class="tut-demo">
+                  <div class="tut-demo-joystick">
+                    <div class="tut-joy-ring">
+                      <div class="tut-joy-knob" id="tutKnob"></div>
+                    </div>
+                  </div>
+                  <div class="tut-demo-labels">
+                    <div class="tut-demo-arrow tut-arrow-left">◀</div>
+                    <div class="tut-demo-arrow tut-arrow-right">▶</div>
+                  </div>
+                </div>
+                <p class="tut-desc">Geser <strong>joystick kiri</strong> untuk bergerak</p>
+              </div>
+
+              <!-- Slide 2: Lompat -->
+              <div class="tut-slide" data-slide="1">
+                <div class="tut-demo">
+                  <div class="tut-demo-btn tut-btn-blue" id="tutJumpDemo">
+                    <span>↑</span>
+                    <span class="tut-btn-label">JUMP</span>
+                  </div>
+                </div>
+                <p class="tut-desc">Tekan <strong>JUMP</strong> untuk melompat<br><small>Gunakan untuk lompat ke platform atas</small></p>
+              </div>
+
+              <!-- Slide 3: Aksi / Buka Peti -->
+              <div class="tut-slide" data-slide="2">
+                <div class="tut-demo">
+                  <div class="tut-demo-btn tut-btn-orange" id="tutActDemo">
+                    <span>⚡</span>
+                    <span class="tut-btn-label">ACT</span>
+                  </div>
+                </div>
+                <p class="tut-desc">Tekan <strong>ACT</strong> untuk menyerang monster<br>dan membuka peti 🎁</p>
+              </div>
+
+              <!-- Slide 4: Kunci + Peti -->
+              <div class="tut-slide" data-slide="3">
+                <div class="tut-demo tut-demo-chest">
+                  <div class="tut-item-row">
+                    <span class="tut-item-icon" id="tutKeyAnim">🔑</span>
+                    <span class="tut-arrow-right-big">→</span>
+                    <span class="tut-item-icon" id="tutChestAnim">🔒</span>
+                    <span class="tut-arrow-right-big">→</span>
+                    <span class="tut-item-icon">✨</span>
+                  </div>
+                </div>
+                <p class="tut-desc">Ambil <strong>kunci 🔑</strong> dulu, lalu <strong>buka peti</strong> dengan ACT</p>
+              </div>
+
+              <!-- Slide 5: Siap! -->
+              <div class="tut-slide" data-slide="4">
+                <div class="tut-demo tut-demo-ready">
+                  <div class="tut-character-anim" id="tutCharAnim">
+                    <div class="sprite character-idle" style="transform:scale(2);transform-origin:bottom center;margin-bottom:14px;"></div>
+                  </div>
+                  <div class="tut-stars-float">⭐💖🌸</div>
+                </div>
+                <p class="tut-desc">Kamu siap memulai petualangan!<br><small>Kumpulkan semua bintang ⭐ untuk nilai penuh</small></p>
+              </div>
+
+            </div><!-- /.tut-slides -->
+
+            <!-- Progress dots -->
+            <div class="tut-dots" id="tutDots">
+              <span class="tut-dot active"></span>
+              <span class="tut-dot"></span>
+              <span class="tut-dot"></span>
+              <span class="tut-dot"></span>
+              <span class="tut-dot"></span>
+            </div>
+
+            <!-- Navigasi -->
+            <div class="tut-nav">
+              <button class="tut-nav-btn tut-skip" id="tutSkip">Skip</button>
+              <button class="tut-nav-btn tut-next pixel-font" id="tutNext">Next ▶</button>
+            </div>
+
+          </div><!-- /.tutorial-card -->
+        </div><!-- /.tutorial-overlay -->
+
         <!-- Mobile Controls (floating overlay) -->
         <div class="mobile-controls" id="mobileControls">
 
@@ -356,6 +452,7 @@
   <script src="js/achievements.js"></script>
   <script src="js/levels.js"></script>
   <script src="js/game.js"></script>
+  <script src="js/tutorial.js"></script>
   <script src="js/secret-garden.js"></script>
   <script src="js/app.js"></script>
 </body>
