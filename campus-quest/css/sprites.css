@@ -1,0 +1,527 @@
+/* ============================================
+   CAMPUS QUEST - PIXEL ART SPRITES (CSS)
+   All sprites built entirely with CSS
+   ============================================ */
+
+/* ---------- BASE SPRITE ---------- */
+.sprite {
+  image-rendering: pixelated;
+  display: block;
+  position: relative;
+}
+
+/* ============================================
+   CHARACTER SPRITES
+   Bocil - a cute pixel-art college girl
+   ============================================ */
+
+/* Character base via box-shadow pixel art */
+.character-idle,
+.character-walk,
+.character-jump,
+.character-celebrate {
+  width: 32px; height: 48px;
+  position: relative;
+  animation-timing-function: steps(1);
+}
+
+/* -- IDLE animation -- */
+.character-idle {
+  animation: charIdleAnim 1.2s steps(2) infinite;
+}
+@keyframes charIdleAnim {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-2px); }
+  100% { transform: translateY(0); }
+}
+
+/* -- WALK animation -- */
+.character-walk {
+  animation: charWalkAnim 0.5s steps(4) infinite;
+}
+@keyframes charWalkAnim {
+  0%   { transform: scaleX(1)  translateY(0); }
+  25%  { transform: scaleX(1)  translateY(-2px); }
+  50%  { transform: scaleX(-1) translateY(0); }
+  75%  { transform: scaleX(-1) translateY(-2px); }
+  100% { transform: scaleX(1)  translateY(0); }
+}
+
+/* -- JUMP animation -- */
+.character-jump {
+  animation: charJumpAnim 0.4s ease forwards;
+}
+@keyframes charJumpAnim {
+  0%   { transform: scaleY(0.8) scaleX(1.2); }
+  30%  { transform: scaleY(1.2) scaleX(0.9) translateY(-16px); }
+  60%  { transform: scaleY(1.0) scaleX(1.0) translateY(-24px); }
+  100% { transform: scaleY(1.0) scaleX(1.0) translateY(0); }
+}
+
+/* -- CELEBRATE animation -- */
+.character-celebrate {
+  animation: charCelebrate 0.6s ease infinite alternate;
+}
+@keyframes charCelebrate {
+  0%   { transform: translateY(0) rotate(-8deg); }
+  100% { transform: translateY(-8px) rotate(8deg); }
+}
+
+/* CSS pixel-art character body */
+.character-idle::before,
+.character-walk::before,
+.character-jump::before,
+.character-celebrate::before {
+  content: '';
+  position: absolute;
+  /* Using box-shadow grid to draw pixel character */
+  /* Each shadow = one pixel: x y 0 size color */
+  width: 2px; height: 2px;
+  /* Hair row */
+  box-shadow:
+    /* Hair */
+    6px 0px 0 2px #5c3317,
+    8px 0px 0 2px #5c3317,
+    10px 0px 0 2px #5c3317,
+    12px 0px 0 2px #5c3317,
+    14px 0px 0 2px #5c3317,
+    16px 0px 0 2px #5c3317,
+    18px 0px 0 2px #5c3317,
+    20px 0px 0 2px #5c3317,
+    /* Forehead row */
+    4px 2px 0 2px #5c3317,
+    6px 2px 0 2px #f5c5a3,
+    8px 2px 0 2px #f5c5a3,
+    10px 2px 0 2px #f5c5a3,
+    12px 2px 0 2px #f5c5a3,
+    14px 2px 0 2px #f5c5a3,
+    16px 2px 0 2px #f5c5a3,
+    18px 2px 0 2px #f5c5a3,
+    20px 2px 0 2px #f5c5a3,
+    22px 2px 0 2px #5c3317,
+    /* Eyes row */
+    4px 4px 0 2px #f5c5a3,
+    6px 4px 0 2px #f5c5a3,
+    8px 4px 0 2px #1a1a1a,
+    10px 4px 0 2px #f5c5a3,
+    12px 4px 0 2px #f5c5a3,
+    14px 4px 0 2px #f5c5a3,
+    16px 4px 0 2px #1a1a1a,
+    18px 4px 0 2px #f5c5a3,
+    20px 4px 0 2px #f5c5a3,
+    22px 4px 0 2px #f5c5a3,
+    /* Mouth row */
+    4px 6px 0 2px #f5c5a3,
+    8px 6px 0 2px #f5c5a3,
+    10px 6px 0 2px #e05090,
+    12px 6px 0 2px #f5c5a3,
+    14px 6px 0 2px #f5c5a3,
+    16px 6px 0 2px #e05090,
+    18px 6px 0 2px #f5c5a3,
+    22px 6px 0 2px #f5c5a3,
+    /* Shirt row 1 */
+    4px 8px 0 2px #ff7eb3,
+    6px 8px 0 2px #ff7eb3,
+    8px 8px 0 2px #ff7eb3,
+    10px 8px 0 2px #ff7eb3,
+    12px 8px 0 2px #fff,
+    14px 8px 0 2px #ff7eb3,
+    16px 8px 0 2px #ff7eb3,
+    18px 8px 0 2px #ff7eb3,
+    20px 8px 0 2px #ff7eb3,
+    22px 8px 0 2px #ff7eb3,
+    /* Shirt row 2 */
+    2px 10px 0 2px #ff7eb3,
+    4px 10px 0 2px #ff7eb3,
+    6px 10px 0 2px #ff7eb3,
+    8px 10px 0 2px #ff7eb3,
+    10px 10px 0 2px #ff7eb3,
+    12px 10px 0 2px #ff7eb3,
+    14px 10px 0 2px #ff7eb3,
+    16px 10px 0 2px #ff7eb3,
+    18px 10px 0 2px #ff7eb3,
+    20px 10px 0 2px #ff7eb3,
+    22px 10px 0 2px #ff7eb3,
+    24px 10px 0 2px #ff7eb3,
+    /* Skirt row */
+    2px 14px 0 2px #9b59b6,
+    4px 14px 0 2px #9b59b6,
+    6px 14px 0 2px #9b59b6,
+    8px 14px 0 2px #9b59b6,
+    10px 14px 0 2px #9b59b6,
+    12px 14px 0 2px #9b59b6,
+    14px 14px 0 2px #9b59b6,
+    16px 14px 0 2px #9b59b6,
+    18px 14px 0 2px #9b59b6,
+    20px 14px 0 2px #9b59b6,
+    22px 14px 0 2px #9b59b6,
+    24px 14px 0 2px #9b59b6,
+    /* Legs */
+    6px 18px 0 2px #f5c5a3,
+    8px 18px 0 2px #f5c5a3,
+    16px 18px 0 2px #f5c5a3,
+    18px 18px 0 2px #f5c5a3,
+    /* Shoes */
+    4px 20px 0 2px #5c3317,
+    6px 20px 0 2px #5c3317,
+    8px 20px 0 2px #5c3317,
+    16px 20px 0 2px #5c3317,
+    18px 20px 0 2px #5c3317,
+    20px 20px 0 2px #5c3317;
+}
+
+/* Scale up for home showcase */
+#homeCharacter {
+  transform: scale(2.5);
+  transform-origin: bottom center;
+  margin-bottom: 24px;
+}
+
+/* ============================================
+   ITEM SPRITES
+   ============================================ */
+
+/* Coffee cup */
+.item-sprite-coffee {
+  width: 24px; height: 24px;
+  position: relative; display: inline-block;
+}
+.item-sprite-coffee::before {
+  content: '☕';
+  font-size: 20px; line-height: 24px;
+  display: block; text-align: center;
+  animation: itemFloat 1.5s ease-in-out infinite;
+}
+
+/* Notebook */
+.item-sprite-notebook::before { content: '📓'; }
+
+/* Book */
+.item-sprite-book::before { content: '📚'; }
+
+/* Star */
+.item-sprite-star::before {
+  content: '⭐';
+  animation: starSpin 3s linear infinite;
+}
+@keyframes starSpin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Coin */
+.item-sprite-coin {
+  width: 16px; height: 16px;
+  background: radial-gradient(circle at 35% 35%, #fff8a0, #ffd43b 50%, #c9a800);
+  border-radius: 50%;
+  border: 1px solid #c9a800;
+  box-shadow: 1px 1px 0 #a07800, 0 0 6px #ffd43b80;
+  animation: coinSpin 0.8s linear infinite;
+}
+@keyframes coinSpin {
+  0%   { transform: scaleX(1); }
+  25%  { transform: scaleX(0.2); }
+  50%  { transform: scaleX(1); }
+  75%  { transform: scaleX(0.2); }
+  100% { transform: scaleX(1); }
+}
+
+/* Chest */
+.chest-sprite {
+  width: 48px; height: 40px;
+  position: relative; display: inline-block;
+  cursor: pointer;
+}
+.chest-sprite::before {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, #8B6914 0%, #c9a800 30%, #8B6914 31%, #a07800 100%);
+  border-radius: 4px 4px 2px 2px;
+  border: 2px solid #5c4a00;
+}
+.chest-sprite::after {
+  content: '🔒';
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1rem;
+}
+.chest-sprite.open::after { content: '🔓'; }
+.chest-sprite.open {
+  animation: chestOpen 0.4s ease forwards;
+}
+@keyframes chestOpen {
+  0%   { transform: scaleY(1); }
+  30%  { transform: scaleY(0.8) scaleX(1.1); }
+  60%  { transform: scaleY(1.1) scaleX(0.9); }
+  100% { transform: scaleY(1); }
+}
+
+/* Monster sprite (CSS) */
+.monster-sprite {
+  width: 40px; height: 40px;
+  position: relative; display: inline-block;
+}
+.monster-overthinking::before {
+  content: '😵‍💫';
+  font-size: 2rem; display: block;
+  animation: monsterWobble 0.6s ease-in-out infinite;
+}
+.monster-deadline::before {
+  content: '⏰';
+  font-size: 2rem; display: block;
+  animation: monsterShake 0.3s ease infinite;
+}
+.monster-boss::before {
+  content: '👹';
+  font-size: 2.5rem; display: block;
+  animation: bossFloat 1s ease-in-out infinite alternate;
+}
+@keyframes monsterWobble {
+  0%,100% { transform: rotate(-10deg) scale(1); }
+  50%      { transform: rotate(10deg) scale(1.1); }
+}
+@keyframes monsterShake {
+  0%,100% { transform: translateX(0); }
+  25%     { transform: translateX(-3px); }
+  75%     { transform: translateX(3px); }
+}
+@keyframes bossFloat {
+  from { transform: translateY(0) scale(1); }
+  to   { transform: translateY(-6px) scale(1.05); }
+}
+
+/* ============================================
+   COLLECTIBLE REWARDS
+   ============================================ */
+.reward-star-icon  { font-size: 1.8rem; animation: rewardPulse 1s ease-in-out infinite alternate; }
+.reward-book-icon  { font-size: 1.8rem; animation: rewardPulse 1s ease-in-out infinite alternate 0.2s; }
+.reward-coffee-icon{ font-size: 1.8rem; animation: rewardPulse 1s ease-in-out infinite alternate 0.4s; }
+.reward-medal-icon { font-size: 1.8rem; animation: rewardPulse 1s ease-in-out infinite alternate 0.6s; }
+
+@keyframes rewardPulse {
+  from { transform: scale(1);    filter: brightness(1); }
+  to   { transform: scale(1.15); filter: brightness(1.3) drop-shadow(0 0 6px #ffd43b); }
+}
+
+/* ============================================
+   ITEM FLOAT ANIMATION (canvas items)
+   ============================================ */
+@keyframes itemFloat {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+
+/* ============================================
+   PLATFORM TILES (decorative CSS)
+   ============================================ */
+.platform-tile {
+  height: 16px;
+  background: repeating-linear-gradient(
+    90deg,
+    #7bc67e 0px, #7bc67e 16px,
+    #6ab56e 16px, #6ab56e 32px
+  );
+  border-top: 3px solid #94d98a;
+  border-radius: 3px 3px 0 0;
+  position: relative;
+}
+.platform-tile::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: rgba(255,255,255,0.3); border-radius: 3px 3px 0 0;
+}
+
+/* Brick tile */
+.brick-tile {
+  height: 16px;
+  background: repeating-linear-gradient(
+    90deg,
+    #c8603a 0px, #c8603a 14px,
+    #b05030 14px, #b05030 16px
+  );
+  border-top: 3px solid #e07050;
+  border-bottom: 2px solid #904020;
+  position: relative;
+}
+
+/* Question block */
+.question-block {
+  width: 32px; height: 32px;
+  background: #ffd43b;
+  border: 3px solid #c9a800;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 1rem; color: #5c4a00;
+  box-shadow: inset 2px 2px 0 rgba(255,255,255,0.5),
+              inset -2px -2px 0 rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.question-block:active { transform: scaleY(0.85); }
+.question-block.hit {
+  background: #c9a800; cursor: default;
+  animation: blockHit 0.2s ease;
+}
+@keyframes blockHit {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+/* ============================================
+   BACKGROUND TILES
+   ============================================ */
+
+/* Campus morning sky */
+.bg-morning {
+  background: linear-gradient(180deg,
+    #87ceeb 0%,
+    #b0e0f5 40%,
+    #e8f4f8 70%,
+    #d4e8c2 85%,
+    #7bc67e 100%
+  );
+}
+
+/* Library interior */
+.bg-library {
+  background: linear-gradient(180deg,
+    #3d2c1e 0%,
+    #5c4a3e 20%,
+    #8B7355 40%,
+    #c4a882 70%,
+    #d4b896 100%
+  );
+}
+
+/* Dungeon */
+.bg-dungeon {
+  background: linear-gradient(180deg,
+    #1a0a2e 0%,
+    #2a1a4e 30%,
+    #3a1a6e 60%,
+    #1a0a2e 100%
+  );
+}
+
+/* Castle */
+.bg-castle {
+  background: linear-gradient(180deg,
+    #0d0d1a 0%,
+    #1a1a3e 30%,
+    #2a2a6e 60%,
+    #1a1a3e 100%
+  );
+}
+
+/* Pixel tree (CSS art) */
+.pixel-tree {
+  display: inline-flex; flex-direction: column; align-items: center;
+  gap: 0;
+}
+.pixel-tree-top {
+  width: 0; height: 0;
+  border-left: 16px solid transparent;
+  border-right: 16px solid transparent;
+  border-bottom: 24px solid #51a045;
+  filter: drop-shadow(0 2px 0 #3d8035);
+}
+.pixel-tree-mid {
+  width: 0; height: 0;
+  border-left: 22px solid transparent;
+  border-right: 22px solid transparent;
+  border-bottom: 28px solid #42904e;
+  margin-top: -10px;
+  filter: drop-shadow(0 2px 0 #2d7040);
+}
+.pixel-tree-trunk {
+  width: 12px; height: 14px;
+  background: #8B6914; border-radius: 2px;
+}
+
+/* Pixel cloud (CSS art) */
+.pixel-cloud-css {
+  background: rgba(255,255,255,0.85);
+  border-radius: 50px;
+  position: relative;
+  box-shadow:
+    0 0 0 3px rgba(255,255,255,0.6),
+    0 4px 0 rgba(200,200,200,0.3);
+}
+.pixel-cloud-css::before {
+  content: '';
+  position: absolute;
+  width: 55%; height: 160%;
+  background: inherit;
+  border-radius: 50%;
+  top: -45%; left: 15%;
+}
+.pixel-cloud-css::after {
+  content: '';
+  position: absolute;
+  width: 40%; height: 140%;
+  background: inherit;
+  border-radius: 50%;
+  top: -35%; right: 12%;
+}
+
+/* ============================================
+   SHINE / COLLECT EFFECT
+   ============================================ */
+.collect-shine {
+  position: absolute; inset: -4px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,212,59,0.8) 0%, transparent 70%);
+  animation: collectShine 0.5s ease forwards;
+  pointer-events: none;
+}
+@keyframes collectShine {
+  0%   { transform: scale(0.5); opacity: 1; }
+  100% { transform: scale(3);   opacity: 0; }
+}
+
+/* ============================================
+   HP / DAMAGE EFFECT
+   ============================================ */
+.damage-flash {
+  animation: damageFlash 0.3s ease;
+}
+@keyframes damageFlash {
+  0%,100% { filter: brightness(1); }
+  50%     { filter: brightness(3) sepia(1) saturate(3) hue-rotate(-30deg); }
+}
+
+/* ============================================
+   PORTAL / LEVEL EXIT
+   ============================================ */
+.portal-sprite {
+  width: 40px; height: 60px;
+  position: relative; display: inline-block;
+}
+.portal-sprite::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center,
+    #cc5de8 0%, #9775fa 40%, #4c3285 70%, transparent 100%
+  );
+  border-radius: 50% 50% 0 0;
+  animation: portalPulse 1.5s ease-in-out infinite;
+  border: 3px solid #cc5de8;
+}
+.portal-sprite::after {
+  content: '✦';
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff; font-size: 1.2rem;
+  animation: portalStar 1s linear infinite;
+}
+@keyframes portalPulse {
+  0%,100% { box-shadow: 0 0 10px #cc5de8, 0 0 20px #9775fa; }
+  50%     { box-shadow: 0 0 20px #cc5de8, 0 0 40px #9775fa, 0 0 60px #4c3285; }
+}
+@keyframes portalStar {
+  0%   { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
