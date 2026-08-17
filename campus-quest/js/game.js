@@ -105,23 +105,21 @@ const Game = (() => {
     const wrapper = canvas.parentElement;
     if (!wrapper) return;
 
-    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches
-                       || window.innerWidth <= 768;
+    const isMobile = window.matchMedia('(pointer: coarse)').matches
+                  || window.innerWidth <= 768;
 
-    const maxW = Math.min(wrapper.clientWidth, 960);
-    canvas.width = maxW;
-
-    // Controls adalah absolute overlay → canvas boleh full height game-area
-    // Sisakan sedikit space bawah agar bisa lihat area bawah tetap terbaca
-    if (isTouchDevice) {
-      const hudH   = 44;
-      const safeBot = 30; // agar konten bawah tidak tertutup penuh joystick
-      const availH = Math.max(
-        (wrapper.clientHeight || window.innerHeight * 0.75) - hudH - safeBot,
-        200
-      );
-      canvas.height = Math.min(availH, Math.round(maxW * 0.65));
+    if (isMobile) {
+      // Mobile: CSS handle height via flex:1 + height:100%
+      // Kita hanya perlu sync canvas buffer size ke CSS rendered size
+      const rect = canvas.getBoundingClientRect();
+      const w = Math.round(rect.width)  || wrapper.clientWidth  || window.innerWidth;
+      const h = Math.round(rect.height) || Math.round(w * 0.7);
+      canvas.width  = w;
+      canvas.height = h > 10 ? h : Math.round(w * 0.7);
     } else {
+      // Desktop: fixed aspect ratio
+      const maxW = Math.min(wrapper.clientWidth, 960);
+      canvas.width  = maxW;
       canvas.height = Math.round(maxW * 0.5);
     }
 
@@ -138,7 +136,7 @@ const Game = (() => {
     const knob  = document.getElementById('joystickKnob');
     if (!zone || !knob) return;
 
-    const RADIUS      = 32;   // px — maksimum jarak knob dari center
+    const RADIUS      = 24;   // px — max jarak knob (zone 90px → radius ~45px tapi limit 24)
     const DEADZONE    = 0.18; // 0–1: rasio gerak minimum sebelum input terdaftar
     const HORIZ_BIAS  = 1.4;  // knob lebih sensitif horisontal (game 2D side-scroller)
 
@@ -348,6 +346,14 @@ const Game = (() => {
     document.getElementById('hudLevelName').textContent = `LV.${id} ${level.name}`;
 
     resizeCanvas();
+
+    // Di mobile: game-area baru jadi visible sekarang, re-measure canvas height
+    // pakai rAF agar browser sudah selesai layout
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        resizeCanvas();
+      });
+    });
 
     running = true;
     lastTime = performance.now();

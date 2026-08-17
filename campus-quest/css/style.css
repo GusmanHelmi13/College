@@ -714,14 +714,14 @@ body {
   display: flex;
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  height: 140px;
+  height: 110px;             /* lebih kecil agar canvas dapat lebih ruang */
   background: linear-gradient(
     to top,
-    rgba(0,0,0,0.82) 0%,
-    rgba(0,0,0,0.48) 65%,
+    rgba(0,0,0,0.80) 0%,
+    rgba(0,0,0,0.40) 60%,
     transparent 100%
   );
-  padding: 0 20px 14px;
+  padding: 0 16px 10px;
   justify-content: space-between;
   align-items: flex-end;
   z-index: 40;
@@ -748,9 +748,9 @@ body {
   pointer-events: none;
 }
 
-/* Zone: area sentuh yang aktif — lebar 110px */
+/* Zone: area sentuh yang aktif — lebar 90px */
 .joystick-zone {
-  width: 110px; height: 110px;
+  width: 90px; height: 90px;
   position: relative;
   pointer-events: all;
   touch-action: none;
@@ -804,7 +804,7 @@ body {
 /* Knob: bola yang bergerak di tengah ring */
 .joystick-knob {
   position: absolute;
-  width: 46px; height: 46px;
+  width: 38px; height: 38px;
   border-radius: 50%;
   /* Start di tengah zone */
   left: 50%; top: 50%;
@@ -867,17 +867,17 @@ body {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 10px;
+  gap: 6px;
   pointer-events: none;
 }
 .action-row-top,
 .action-row-bot {
   display: flex;
-  gap: 10px;
+  gap: 6px;
 }
 
 .action-btn {
-  width: 62px; height: 62px;
+  width: 52px; height: 52px;
   border-radius: 50%;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
@@ -1385,9 +1385,9 @@ html, body {
 /* Game area takes full remaining height on mobile */
 @media (pointer: coarse), (max-width: 768px) {
 
-  /* ── Page game: full viewport, flex column ── */
+  /* ── Page game: full viewport ── */
   #page-game {
-    /* padding-top: 60px sudah dari base .page — JANGAN override */
+    /* base .page sudah set padding-top: 60px */
     height: 100dvh;
     overflow: hidden;
     display: flex;
@@ -1395,58 +1395,69 @@ html, body {
     background: var(--bg-primary);
   }
 
+  /* game-wrapper: isi sisa tinggi viewport setelah navbar */
   .game-wrapper {
     flex: 1;
-    padding: 8px 8px 0;
+    min-height: 0;           /* kritis agar flex child bisa shrink */
+    padding: 6px 6px 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    /* hapus min-height yang ada di desktop — pakai flex saja */
-    min-height: 0;
   }
 
-  /* Level hub: scrollable kalau konten panjang */
+  /* Level hub: scrollable */
   .level-hub {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 20px;
+    padding-bottom: 16px;
   }
 
-  /* Game area aktif: isi sisa ruang */
+  /* Game area aktif: isi semua sisa ruang */
   .game-area.active {
     flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     position: relative;
-    border-radius: 8px;
+    border-radius: 6px;
     overflow: hidden;
-    min-height: 0;   /* penting untuk flex child */
   }
 
-  /* game-area tidak aktif tetap hidden */
+  /* game-area tidak aktif */
   .game-area:not(.active) {
     display: none !important;
   }
 
-  /* Canvas: isi ruang yang tersisa setelah HUD */
+  /* HUD compact — fixed height */
+  .game-hud {
+    height: 36px;
+    min-height: 36px;
+    max-height: 36px;
+    flex-shrink: 0;
+    padding: 0 8px;
+  }
+  .hud-level-name  { font-size: 0.38rem; }
+  .hp-bar          { width: 60px; height: 8px; }
+  .hud-score       { font-size: 0.42rem; }
+  .hud-btn         { font-size: 0.65rem; padding: 2px 6px; }
+
+  /* Canvas: isi SEMUA ruang tersisa di bawah HUD
+     controls adalah absolute overlay, tidak perlu dikurangi */
   #gameCanvas {
     flex: 1;
-    width: 100% !important;
     min-height: 0;
+    width: 100% !important;
+    height: 100% !important;   /* override JS sizing di mobile */
     display: block;
-    margin-bottom: 0 !important;
+    margin: 0 !important;
+    /* Pixel art rendering */
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
   }
 
-  /* HUD compact */
-  .game-hud {
-    padding: 4px 8px;
-    min-height: 40px;
-    flex-shrink: 0;
-  }
-  .hud-level-name { font-size: 0.4rem; }
-  .hp-bar         { width: 70px; }
-  .hud-score      { font-size: 0.45rem; }
+  /* Controls: absolute overlay, sudah di-set global */
 
   /* Level map vertical */
   .level-map {
@@ -1456,23 +1467,22 @@ html, body {
   .level-connector { transform: rotate(90deg); margin: -4px 0; }
   .level-card      { width: min(280px, 90vw); }
 
-  /* Overlays full-width */
+  /* Overlays */
   .pause-card, .level-complete-card {
     width: 88vw; max-width: 340px;
-    padding: 20px 16px; gap: 10px;
+    padding: 16px 14px; gap: 8px;
   }
-  .pause-card h2   { font-size: 0.7rem; }
-  .message-popup-inner { width: 88vw; padding: 20px 16px; }
-  .message-text    { font-size: 0.9rem; }
+  .pause-card h2       { font-size: 0.65rem; }
+  .complete-title      { font-size: 0.65rem; }
+  .message-popup-inner { width: 88vw; padding: 16px 14px; }
+  .message-text        { font-size: 0.88rem; }
 
   /* Home page compact */
   .home-content    { padding: 20px 16px 40px; gap: 20px; }
   .home-actions    { flex-direction: column; align-items: center; }
   .pixel-btn       { font-size: 0.55rem; padding: 10px 16px; }
-
-  /* Stats */
-  .stat-card  { min-width: 72px; padding: 10px 12px; }
-  .stat-value { font-size: 0.9rem; }
+  .stat-card       { min-width: 72px; padding: 10px 12px; }
+  .stat-value      { font-size: 0.9rem; }
 
   /* Achievements 2-col */
   .achievements-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
@@ -1480,11 +1490,10 @@ html, body {
   .ach-icon  { font-size: 1.8rem; }
   .ach-name  { font-size: 0.68rem; }
 
-  /* Toast & popup */
-  .toast-container { bottom: 24px; right: 12px; }
+  /* Toast & achievement popup */
+  .toast-container       { bottom: 24px; right: 12px; }
   .achievement-popup.show { bottom: 20px; }
 
-  /* Very small screens */
   @media (max-width: 380px) {
     .progress-bar-mini, .progress-label { display: none; }
     .nav-title { display: none; }
