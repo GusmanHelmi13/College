@@ -180,6 +180,9 @@ const Achievements = (() => {
     unlockedIds.add(id);
     if (gameState) {
       gameState.achievements = [...unlockedIds];
+      // Simpan tanggal unlock (BUG-05)
+      if (!gameState.achievementDates) gameState.achievementDates = {};
+      if (!gameState.achievementDates[id]) gameState.achievementDates[id] = Date.now();
       Storage.save(gameState);
     }
 

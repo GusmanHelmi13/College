@@ -573,9 +573,9 @@ const Game = (() => {
       const trigK = level.triggers?.find(t => t.type === 'item' && t.itemId === it.id);
       if (trigK && !firedTriggers.has(trigK.id)) {
         firedTriggers.add(trigK.id);
-        scheduleMesage(LevelData.resolveMsg(trigK.msg));
+        scheduleMessage(LevelData.resolveMsg(trigK.msg));
       } else {
-        scheduleMesage('🔑 Kunci ditemukan! Sekarang kamu bisa membuka peti di depan!');
+        scheduleMessage('🔑 Kunci ditemukan! Sekarang kamu bisa membuka peti di depan!');
       }
       return;
     }
@@ -598,7 +598,7 @@ const Game = (() => {
     const trig = level.triggers?.find(t => t.type === 'item' && t.itemId === it.id);
     if (trig && !firedTriggers.has(trig.id)) {
       firedTriggers.add(trig.id);
-      scheduleMesage(LevelData.resolveMsg(trig.msg));
+      scheduleMessage(LevelData.resolveMsg(trig.msg));
     }
   }
 
@@ -648,7 +648,7 @@ const Game = (() => {
 
     const trig = level.triggers?.find(t => t.type === 'chest' && t.chestId === ch.id);
     const msg  = trig ? LevelData.resolveMsg(trig.msg) : randomFrom(window.MESSAGES?.affirmations || ['💖']);
-    scheduleMesage(msg);
+    scheduleMessage(msg);
     updateHUD();
   }
 
@@ -804,7 +804,7 @@ const Game = (() => {
   }
 
   /* ---------- MESSAGES ---------- */
-  function scheduleMesage(text) {
+  function scheduleMessage(text) {
     pendingMessage = text;
     if (!messageActive) showMessage();
   }
