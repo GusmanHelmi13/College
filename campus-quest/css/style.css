@@ -236,10 +236,16 @@ body {
    PAGES
    ============================================ */
 .page {
-  display: none; min-height: 100vh;
+  display: none;
+  min-height: 100vh;
   padding-top: 60px;
+  position: relative;   /* buat stacking context sendiri */
+  z-index: 1;           /* di atas home-bg yang fixed */
+  background: var(--bg-primary);  /* setiap page punya background sendiri */
 }
 .page.active { display: block; }
+/* Home page tidak butuh background sendiri — pakai animated home-bg */
+#page-home { background: transparent; }
 .page.slide-in {
   animation: slideInPage 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -254,6 +260,13 @@ body {
 .home-bg {
   position: fixed; inset: 0; z-index: 0; overflow: hidden;
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s;
+  /* Defaultnya hidden — JS dan CSS toggle visibility */
+}
+#page-home.active .home-bg {
+  opacity: 1;
+}
 }
 
 /* Cloud layer */
@@ -628,6 +641,7 @@ body {
 
 /* Game Area */
 .game-area {
+  display: none;         /* hidden by default — JS toggle via inline style + .active class */
   width: 100%; position: relative;
   background: #000; border-radius: 12px;
   overflow: hidden;
@@ -1320,7 +1334,10 @@ body {
 #gameCanvas { min-height: 280px; }
 
 /* Ensure game-wrapper doesn't clip level hub on small screens */
-.game-wrapper { min-height: calc(100vh - 60px); }
+/* (min-height hanya untuk desktop) */
+@media (min-width: 769px) {
+  .game-wrapper { min-height: calc(100vh - 60px); }
+}
 
 /* Fix: photo viewer z-index above garden */
 #photoViewer { z-index: 810; }
@@ -1330,7 +1347,7 @@ body {
 .achievement-popup { pointer-events: none; }
 
 /* Fix: dark mode body bg covers full page */
-body.dark-mode #page-home .home-bg { opacity: 1; }
+body.dark-mode #page-home.active .home-bg { opacity: 1; }
 
 /* Garden back button positioning */
 .garden-back-btn {
@@ -1367,13 +1384,15 @@ html, body {
 
 /* Game area takes full remaining height on mobile */
 @media (pointer: coarse), (max-width: 768px) {
-  /* Page fills the full viewport */
+
+  /* ── Page game: full viewport, flex column ── */
   #page-game {
-    padding-top: 60px;
-    height: 100dvh;             /* dynamic viewport height — accounts for browser chrome */
+    /* padding-top: 60px sudah dari base .page — JANGAN override */
+    height: 100dvh;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    background: var(--bg-primary);
   }
 
   .game-wrapper {
@@ -1382,9 +1401,19 @@ html, body {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    /* hapus min-height yang ada di desktop — pakai flex saja */
+    min-height: 0;
   }
 
-  /* Game area fills available height — gunakan class .active, bukan display:flex !important */
+  /* Level hub: scrollable kalau konten panjang */
+  .level-hub {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 20px;
+  }
+
+  /* Game area aktif: isi sisa ruang */
   .game-area.active {
     flex: 1;
     display: flex;
@@ -1392,85 +1421,70 @@ html, body {
     position: relative;
     border-radius: 8px;
     overflow: hidden;
+    min-height: 0;   /* penting untuk flex child */
   }
-  /* Pastikan game-area tersembunyi saat tidak aktif */
+
+  /* game-area tidak aktif tetap hidden */
   .game-area:not(.active) {
     display: none !important;
   }
 
-  /* Canvas stretches to fill (JS sets explicit px size) */
+  /* Canvas: isi ruang yang tersisa setelah HUD */
   #gameCanvas {
     flex: 1;
     width: 100% !important;
+    min-height: 0;
     display: block;
     margin-bottom: 0 !important;
   }
 
-  /* HUD compact on mobile */
+  /* HUD compact */
   .game-hud {
     padding: 4px 8px;
     min-height: 40px;
     flex-shrink: 0;
   }
   .hud-level-name { font-size: 0.4rem; }
-  .hp-bar { width: 70px; }
-  .hud-score { font-size: 0.45rem; }
+  .hp-bar         { width: 70px; }
+  .hud-score      { font-size: 0.45rem; }
 
-  /* Controls sit at the bottom of .game-area (override height ke 140px) */
-  /* mobile-controls sudah di-set globally, tidak perlu override di sini */
-
-  /* Level hub scrollable on small screens */
-  .level-hub { overflow-y: auto; max-height: calc(100dvh - 80px); padding-bottom: 20px; }
-
-  /* Level map vertical on mobile */
+  /* Level map vertical */
   .level-map {
     flex-direction: column;
     align-items: center;
   }
   .level-connector { transform: rotate(90deg); margin: -4px 0; }
-  .level-card { width: min(280px, 90vw); }
+  .level-card      { width: min(280px, 90vw); }
 
-  /* Pause/complete overlays full-width */
+  /* Overlays full-width */
   .pause-card, .level-complete-card {
-    width: 88vw;
-    max-width: 340px;
-    padding: 20px 16px;
-    gap: 10px;
+    width: 88vw; max-width: 340px;
+    padding: 20px 16px; gap: 10px;
   }
-  .pause-card h2 { font-size: 0.7rem; }
-
-  /* Message popup full-width */
-  .message-popup-inner {
-    width: 88vw;
-    padding: 20px 16px;
-  }
-  .message-text { font-size: 0.9rem; }
+  .pause-card h2   { font-size: 0.7rem; }
+  .message-popup-inner { width: 88vw; padding: 20px 16px; }
+  .message-text    { font-size: 0.9rem; }
 
   /* Home page compact */
-  .home-content { padding: 20px 16px 40px; gap: 20px; }
-  .home-actions { flex-direction: column; align-items: center; }
-  .pixel-btn    { font-size: 0.55rem; padding: 10px 16px; }
+  .home-content    { padding: 20px 16px 40px; gap: 20px; }
+  .home-actions    { flex-direction: column; align-items: center; }
+  .pixel-btn       { font-size: 0.55rem; padding: 10px 16px; }
 
-  /* Stats row wraps tightly */
-  .stat-card { min-width: 72px; padding: 10px 12px; }
+  /* Stats */
+  .stat-card  { min-width: 72px; padding: 10px 12px; }
   .stat-value { font-size: 0.9rem; }
 
-  /* Achievements grid 2-col on small phones */
-  .achievements-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-  .ach-card { padding: 12px 10px; }
-  .ach-icon { font-size: 1.8rem; }
-  .ach-name { font-size: 0.68rem; }
+  /* Achievements 2-col */
+  .achievements-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .ach-card  { padding: 12px 10px; }
+  .ach-icon  { font-size: 1.8rem; }
+  .ach-name  { font-size: 0.68rem; }
 
-  /* Toast bottom margin so it clears mobile nav bar */
+  /* Toast & popup */
   .toast-container { bottom: 24px; right: 12px; }
-
-  /* Achievement popup above thumb zone */
   .achievement-popup.show { bottom: 20px; }
 
-  /* Progress bar mini hidden on very small screens */
+  /* Very small screens */
   @media (max-width: 380px) {
     .progress-bar-mini, .progress-label { display: none; }
     .nav-title { display: none; }

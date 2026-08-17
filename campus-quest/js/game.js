@@ -333,10 +333,12 @@ const Game = (() => {
     // Update HUD
     updateHUD();
 
-    // Show canvas, hide hub — gunakan class active agar CSS mobile tidak override
+    // Show canvas, hide hub
     document.getElementById('levelHub').style.display  = 'none';
     const gameArea = document.getElementById('gameArea');
-    gameArea.style.display = '';        // bersihkan inline style
+    // Di mobile: CSS .active handle flex layout
+    // Di desktop: perlu set display block/flex via style
+    gameArea.style.display = 'block';
     gameArea.classList.add('active');
     document.getElementById('levelCompleteOverlay').style.display = 'none';
     document.getElementById('pauseOverlay').style.display         = 'none';
